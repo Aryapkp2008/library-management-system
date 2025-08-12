@@ -1,13 +1,15 @@
 import java.util.List;
 import java.util.Scanner;
+import java.io.File;
 
 public class LibraryManagementSystem {
-    private static Library library = new Library();
+    private static Library library;
+    private static final String DATA_FILE = "library_data.ser";
     private static Scanner scanner = new Scanner(System.in);
     
     public static void main(String[] args) {
-        // Add some sample data
-        initializeLibrary();
+        // Load library data or initialize new library
+        loadLibrary();
         
         boolean running = true;
         while (running) {
@@ -25,7 +27,11 @@ public class LibraryManagementSystem {
                     transactionManagement();
                     break;
                 case 4:
+                    saveLibrary();
+                    break;
+                case 5:
                     running = false;
+                    saveLibrary();
                     System.out.println("Thank you for using the Library Management System!");
                     break;
                 default:
@@ -35,16 +41,27 @@ public class LibraryManagementSystem {
         scanner.close();
     }
     
-    private static void initializeLibrary() {
-        // Add sample books
-        library.addBook(new Book("B001", "The Great Gatsby", "F. Scott Fitzgerald", "Classic"));
-        library.addBook(new Book("B002", "To Kill a Mockingbird", "Harper Lee", "Fiction"));
-        library.addBook(new Book("B003", "1984", "George Orwell", "Dystopian"));
-        library.addBook(new Book("B004", "The Hobbit", "J.R.R. Tolkien", "Fantasy"));
-        
-        // Add sample members
-        library.addMember(new Member("M001", "John Doe", "john@example.com", "555-1234"));
-        library.addMember(new Member("M002", "Jane Smith", "jane@example.com", "555-5678"));
+    private static void loadLibrary() {
+        File file = new File(DATA_FILE);
+        if (file.exists()) {
+            library = Library.loadFromFile(DATA_FILE);
+        } else {
+            library = new Library();
+            // Add sample books
+            library.addBook(new Book("B001", "The Great Gatsby", "F. Scott Fitzgerald", "Classic", "978-0743273565", 1925, "Scribner", 3));
+            library.addBook(new Book("B002", "To Kill a Mockingbird", "Harper Lee", "Fiction", "978-0061120084", 1960, "HarperCollins", 2));
+            library.addBook(new Book("B003", "1984", "George Orwell", "Dystopian", "978-0451524935", 1949, "Signet Classic", 5));
+            library.addBook(new Book("B004", "The Hobbit", "J.R.R. Tolkien", "Fantasy", "978-0547928227", 1937, "Houghton Mifflin", 4));
+            
+            // Add sample members
+            library.addMember(new Member("M001", "John Doe", "john@example.com", "555-1234"));
+            library.addMember(new Member("M002", "Jane Smith", "jane@example.com", "555-5678"));
+        }
+    }
+    
+    private static void saveLibrary() {
+        library.saveToFile(DATA_FILE);
+        System.out.println("Library data saved successfully!");
     }
     
     private static void displayMainMenu() {
@@ -52,7 +69,8 @@ public class LibraryManagementSystem {
         System.out.println("1. Book Management");
         System.out.println("2. Member Management");
         System.out.println("3. Transaction Management");
-        System.out.println("4. Exit");
+        System.out.println("4. Save Library Data");
+        System.out.println("5. Exit");
         System.out.print("Enter your choice: ");
     }
     
@@ -341,4 +359,4 @@ public class LibraryManagementSystem {
             System.out.println("No transactions in the library!");
         }
     }
-} 
+}

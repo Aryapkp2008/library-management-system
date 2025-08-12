@@ -49,11 +49,13 @@ public class Member implements Serializable {
     }
 
     // Method to return a book
-    public void returnBook(Book book) {
+    public boolean returnBook(Book book) {
         if (borrowedBooks.contains(book)) {
             borrowedBooks.remove(book);
             book.setAvailable(true);
+            return true;
         }
+        return false;
     }
 
     @Override
@@ -66,4 +68,4 @@ public class Member implements Serializable {
                 ", borrowedBooks=" + borrowedBooks.size() +
                 '}';
     }
-} 
+}

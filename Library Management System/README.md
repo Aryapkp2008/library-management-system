@@ -1,12 +1,15 @@
 # Library Management System
 
-A Java application for managing a library's books, members, and transactions. Available in both console and GUI versions.
+A Java application for managing a library's books, members, and transactions. Available in both console and GUI versions. The system now includes data persistence and enhanced book management features.
 
 ## Features
 
 - **Book Management**: Add, remove, and search for books by ID, title, or author
+- **Enhanced Book Details**: Track ISBN, publication year, publisher, and multiple copies
 - **Member Management**: Add, remove, and search for library members
 - **Transaction Management**: Check out books, return books, and view transaction history
+- **Data Persistence**: Save and load library data between sessions
+- **Book Statistics**: Track popular books based on checkout frequency
 
 ## Project Structure
 
@@ -29,18 +32,25 @@ Library Management System/
    cd "Library Management System"
    ```
 
-2. Compile the Java files:
+2. Use the build script to compile:
    ```
-   javac src/*.java
+   build.bat
    ```
 
 3. Run the console application:
    ```
-   java -cp src LibraryManagementSystem
+   run-console.bat
    ```
 
 4. Or run the GUI application:
    ```
+   run-gui.bat
+   ```
+
+5. Alternatively, you can compile and run manually:
+   ```
+   javac src/*.java
+   java -cp src LibraryManagementSystem
    java -cp src LibraryManagementSystemGUI
    ```
 

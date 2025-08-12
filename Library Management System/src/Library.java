@@ -1,18 +1,56 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.io.Serializable;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
+import java.io.File;
 
 public class Library implements Serializable {
     private static final long serialVersionUID = 1L;
     
-    private transient List<Book> books;
-    private transient List<Member> members;
-    private transient List<Transaction> transactions;
+    private List<Book> books;
+    private List<Member> members;
+    private List<Transaction> transactions;
+    private Map<String, Integer> bookStats; // For tracking popular books
 
     public Library() {
         this.books = new ArrayList<>();
         this.members = new ArrayList<>();
         this.transactions = new ArrayList<>();
+        this.bookStats = new HashMap<>();
+    }
+    
+    // Save library data to file
+    public void saveToFile(String filename) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
+            oos.writeObject(this);
+            System.out.println("Library data saved successfully to " + filename);
+        } catch (IOException e) {
+            System.out.println("Error saving library data: " + e.getMessage());
+        }
+    }
+    
+    // Load library data from file
+    public static Library loadFromFile(String filename) {
+        File file = new File(filename);
+        if (!file.exists()) {
+            System.out.println("No saved library data found. Creating new library.");
+            return new Library();
+        }
+        
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename))) {
+            Library library = (Library) ois.readObject();
+            System.out.println("Library data loaded successfully from " + filename);
+            return library;
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error loading library data: " + e.getMessage());
+            return new Library();
+        }
     }
 
     // Book Management Methods
@@ -79,6 +117,10 @@ public class Library implements Serializable {
         if (member != null && book != null && book.isAvailable()) {
             member.borrowBook(book);
             transactions.add(new Transaction(book, member, Transaction.Type.CHECKOUT));
+            
+            // Update book stats
+            bookStats.put(bookId, bookStats.getOrDefault(bookId, 0) + 1);
+            
             System.out.println("Book checked out successfully!");
         } else {
             System.out.println("Unable to checkout the book!");
@@ -89,10 +131,13 @@ public class Library implements Serializable {
         Member member = findMemberById(memberId);
         Book book = findBookById(bookId);
         
-        if (member != null && book != null && !book.isAvailable()) {
-            member.returnBook(book);
-            transactions.add(new Transaction(book, member, Transaction.Type.RETURN));
-            System.out.println("Book returned successfully!");
+        if (member != null && book != null) {
+            if (member.returnBook(book)) {
+                transactions.add(new Transaction(book, member, Transaction.Type.RETURN));
+                System.out.println("Book returned successfully!");
+            } else {
+                System.out.println("This member has not borrowed this book!");
+            }
         } else {
             System.out.println("Unable to return the book!");
         }
@@ -120,4 +165,4 @@ public class Library implements Serializable {
     public List<Transaction> getTransactions() {
         return transactions;
     }
-} 
+}
